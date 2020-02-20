@@ -98,7 +98,6 @@ tr467:
 	{ mark = p; }
 #line 104 "./fylee/uri.rl"
 	{
-        //std::cout << std::string(mark, fpc - mark) << std::endl;
         uri->setQuery(std::string(mark, p - mark));
         mark = NULL;
     }
@@ -106,7 +105,6 @@ tr467:
 tr469:
 #line 104 "./fylee/uri.rl"
 	{
-        //std::cout << std::string(mark, fpc - mark) << std::endl;
         uri->setQuery(std::string(mark, p - mark));
         mark = NULL;
     }
@@ -117,7 +115,6 @@ tr474:
 #line 43 "./fylee/uri.rl"
 	{
         if (mark != NULL) {
-            //std::cout << std::string(mark, fpc - mark) << std::endl;
             uri->setHost(std::string(mark, p - mark));
         }
     }
@@ -126,7 +123,6 @@ tr485:
 #line 43 "./fylee/uri.rl"
 	{
         if (mark != NULL) {
-            //std::cout << std::string(mark, fpc - mark) << std::endl;
             uri->setHost(std::string(mark, p - mark));
         }
     }
@@ -157,13 +153,11 @@ tr548:
 #line 43 "./fylee/uri.rl"
 	{
         if (mark != NULL) {
-            //std::cout << std::string(mark, fpc - mark) << std::endl;
             uri->setHost(std::string(mark, p - mark));
         }
     }
 #line 78 "./fylee/uri.rl"
 	{
-            //std::cout << std::string(mark, fpc - mark) << std::endl;
         uri->setPath(std::string(mark, p - mark));
         mark = NULL;
     }
@@ -172,7 +166,6 @@ tr559:
 #line 43 "./fylee/uri.rl"
 	{
         if (mark != NULL) {
-            //std::cout << std::string(mark, fpc - mark) << std::endl;
             uri->setHost(std::string(mark, p - mark));
         }
     }
@@ -180,7 +173,6 @@ tr559:
 	{ mark = p; }
 #line 78 "./fylee/uri.rl"
 	{
-            //std::cout << std::string(mark, fpc - mark) << std::endl;
         uri->setPath(std::string(mark, p - mark));
         mark = NULL;
     }
@@ -188,7 +180,6 @@ tr559:
 tr563:
 #line 78 "./fylee/uri.rl"
 	{
-            //std::cout << std::string(mark, fpc - mark) << std::endl;
         uri->setPath(std::string(mark, p - mark));
         mark = NULL;
     }
@@ -205,7 +196,6 @@ tr566:
     }
 #line 78 "./fylee/uri.rl"
 	{
-            //std::cout << std::string(mark, fpc - mark) << std::endl;
         uri->setPath(std::string(mark, p - mark));
         mark = NULL;
     }

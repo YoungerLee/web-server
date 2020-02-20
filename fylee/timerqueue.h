@@ -8,9 +8,7 @@
 namespace fylee {
 class EventLoop;
 class Channel;
-/**
- * @brief 定时器管理器
- */
+
 class TimerQueue : public Noncopyable {
 friend class Timer;
 public:
@@ -42,13 +40,10 @@ public:
     void onTimerInsertedAtFront(uint64_t earliest);
 
 private:
-    // Mutex
     RWMutexType mutex_;
-    // 定时器集合
     std::set<Timer::ptr, Timer::Comparator> timers_;
-    // std::priority_queue<Timer::ptr, std::vector<Timer::ptr>, Timer::Comparator> timers_;
-    // 是否触发onTimerInsertedAtFront
-    bool tickled_ = false;
+ 
+    bool tickled_ = false;  // 是否触发onTimerInsertedAtFront
     // 上次执行时间
     uint64_t previouseTime_ = 0;
 

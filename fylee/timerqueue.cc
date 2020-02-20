@@ -15,7 +15,6 @@ TimerQueue::TimerQueue(EventLoop* loop)
      callingExpiredTimers_(false) {
     previouseTime_ = fylee::GetCurrentMS();
     timerfdChannel_->setReadCallback(std::bind(&TimerQueue::handleRead, this));
-    // we are always reading the timerfd, we disarm it with timerfd_settime.
     timerfdChannel_->enableReading();
 }
 
@@ -186,7 +185,6 @@ void TimerQueue::readTimerfd(int timerfd, uint64_t now) {
 }
 
 void TimerQueue::resetTimerfd(int timerfd, uint64_t expiration) {
-    // wake up loop by timerfd_settime()
     struct itimerspec newValue;
     struct itimerspec oldValue;
  
@@ -208,7 +206,6 @@ void TimerQueue::handleRead() {
     readTimerfd(timerfd_, now_ms);
 
     callingExpiredTimers_ = true;
-    // safe to callback outside critical section
     for (auto& it : expired) {
         it();
     }

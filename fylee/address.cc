@@ -62,8 +62,6 @@ bool Address::Lookup(std::vector<Address::ptr>& result, const std::string& host,
     std::string node;
     const char* service = NULL;
 
-    // 检查 ipv6address serivce 
-    // e.g. [3ff3:b80:1f8d:2:204:acff:fe17:bf38]:21
     if(!host.empty() && host[0] == '[') {
         auto ipv6end = host.find_first_of(']');
         if(ipv6end != host.npos) {
@@ -74,8 +72,6 @@ bool Address::Lookup(std::vector<Address::ptr>& result, const std::string& host,
         node = host.substr(1, ipv6end - 1);
     }
   
-    // 检查 ipv4address serivce 
-    // e.g. www.baidu.com:21
     if(node.empty()) {
         auto split = host.find_first_of(':');
         if(split != host.npos && split + 1 != host.npos) {
@@ -98,7 +94,6 @@ bool Address::Lookup(std::vector<Address::ptr>& result, const std::string& host,
     next = results;
     while(next) {
         result.push_back(Create(next->ai_addr, (socklen_t)next->ai_addrlen));
-        //LOG_INFO(g_logger) << ((sockaddr_in*)next->ai_addr)->sin_addr.s_addr;
         next = next->ai_next;
     }
 

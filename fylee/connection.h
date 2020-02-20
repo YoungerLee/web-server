@@ -42,11 +42,11 @@ public:
    
     void send(const void* message, int len);
     void send(const std::string& message);
-    void send(std::shared_ptr<Buffer> message);  // this one will swap data
-    void shutdown(); // NOT thread safe, no simultaneous calling
+    void send(std::shared_ptr<Buffer> message);  
+    void shutdown(); 
     void forceClose();
     void forceCloseWithDelay(uint64_t seconds);
-    // reading or not
+ 
     void startRead();
     void stopRead();
 
@@ -70,8 +70,8 @@ public:
 
     void setCloseCallback(const CloseCallback& cb) { closeCallback_ = cb; }
 
-    void connectEstablished();   // should be called only once
-    void connectDestroyed();  // should be called only once
+    void connectEstablished(); 
+    void connectDestroyed();  
 private:
     enum StateE { kDisconnected, kConnecting, kConnected, kDisconnecting };
     void handleRead(uint64_t receiveTime);
@@ -81,7 +81,7 @@ private:
     void sendInLoop(const std::string& message);
     void sendInLoop(const void* message, size_t len);
     void shutdownInLoop();
-    // void shutdownAndForceCloseInLoop(double seconds);
+
     void forceCloseInLoop();
     void setState(StateE s) { state_ = s; }
     const char* stateToString() const;
@@ -92,9 +92,8 @@ private:
     const std::string name_;
     std::shared_ptr<Socket> socket_;
     std::shared_ptr<SocketStream> stream_;
-    std::atomic<StateE> state_;  // FIXME: use atomic variable
+    std::atomic<StateE> state_; 
     bool reading_;
-    // we don't expose those classes to client.
     std::unique_ptr<Channel> channel_;
     ConnectionCallback connectionCallback_;
     MessageCallback messageCallback_;
@@ -103,7 +102,7 @@ private:
     CloseCallback closeCallback_;
     size_t highWaterMark_;
     std::shared_ptr<Buffer> inputBuffer_;
-    std::shared_ptr<Buffer> outputBuffer_; // FIXME: use list<Buffer> as output buffer.
+    std::shared_ptr<Buffer> outputBuffer_; 
 };
 }
 #endif

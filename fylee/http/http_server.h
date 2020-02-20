@@ -16,14 +16,8 @@ public:
 
     HttpServer(EventLoop* loop, const std::shared_ptr<Address> addr, bool keepalive = false, int threads = 1);
 
-    /**
-     * @brief 获取ServletDispatch
-     */
     ServletDispatch::ptr getServletDispatch() const { return dispatch_;}
 
-    /**
-     * @brief 设置ServletDispatch
-     */
     void setServletDispatch(ServletDispatch::ptr v) { dispatch_ = v;}
 
     virtual void setName(const std::string& name) override;

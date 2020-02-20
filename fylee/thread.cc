@@ -85,7 +85,6 @@ void* Thread::run(void* arg) {
     Functor func;
     func.swap(thread->func_);
 
-    // thread->semaphore_.notify();
     thread->latch_.countDown();
     func();
     return 0;

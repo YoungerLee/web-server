@@ -42,7 +42,6 @@ EventLoop::EventLoop()
         t_loopInThisThread = this;
     }
     wakeupChannel_->setReadCallback(std::bind(&EventLoop::handleRead, this));
-    // we are always reading the wakeupfd
     wakeupChannel_->enableReading();
 }
 
@@ -60,7 +59,7 @@ void EventLoop::loop() {
     ASSERT(!looping_);
     assertInLoopThread();
     looping_ = true;
-    quit_ = false;  // FIXME: what if someone calls quit() before loop() ?
+    quit_ = false;  
     LOG_INFO(g_logger) << "EventLoop " << this << " start looping";
 
     while (!quit_) {

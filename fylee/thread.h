@@ -36,7 +36,6 @@ private:
     bool started_;
     bool joined_;
     std::string name_;
-    // Semaphore semaphore_;
     CountDownLatch latch_;
 };
 

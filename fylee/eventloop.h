@@ -47,13 +47,11 @@ public:
  
     void cancel(Timer::ptr timer);
 
-    // internal usage
     void wakeup();
     void updateChannel(Channel* channel);
     void removeChannel(Channel* channel);
     bool hasChannel(Channel* channel);
 
-    // pid_t threadId() const { return threadId_; }
     void assertInLoopThread() {
         if (!isInLoopThread()) {
             abortNotInLoopThread();

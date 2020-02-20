@@ -135,7 +135,7 @@ void TcpServer::newConnection(const Socket::ptr client) {
         stream = std::make_shared<http::HttpSession>(client, false);
     else 
         stream = std::make_shared<SocketStream>(client, false);
-    Connection::ptr conn = std::make_shared<Connection>(ioLoop, connName, client, stream));
+    Connection::ptr conn = std::make_shared<Connection>(ioLoop, connName, client, stream);
     connections_[connName] = conn;
     conn->setConnectionCallback(connectionCallback_);
     conn->setMessageCallback(messageCallback_);

@@ -12,7 +12,7 @@
 #include "channel.h"
 #include "socket.h"
 #include "buffer.h"
-#include "streams/socket_stream.h"
+#include "socket_stream.h"
 #include "http/http_session.h"
 
 namespace fylee {
@@ -88,7 +88,7 @@ void Connection::sendInLoop(const void* data, size_t len) {
         LOG_WARN(g_logger) << "disconnected, give up writing";
         return;
     }
-    // if no thing in output queue, try writing directly
+
     if (!channel_->isWriting() && outputBuffer_->getReadSize() == 0) {
         nwrote = stream_->write(data, len);
         if (nwrote >= 0) { 
