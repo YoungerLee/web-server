@@ -48,10 +48,6 @@ public:
     size_t getBaseSize() const { return baseSize_;}
 
     size_t getReadSize() const { return size_ - position_;}
-
-    bool isLittleEndian() const;
-
-    void setIsLittleEndian(bool val);
   
     std::string toString() const;
     
