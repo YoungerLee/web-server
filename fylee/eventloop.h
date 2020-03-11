@@ -4,9 +4,6 @@
 #include <atomic>
 #include <functional>
 #include <memory>
-#include <boost/any.hpp>
-
-
 #include "thread.h"
 #include "timer.h"
 #include "util.h"
@@ -61,12 +58,6 @@ public:
 
     bool eventHandling() const { return eventHandling_; }
 
-    void setContext(const boost::any& context) { context_ = context; }
-
-    const boost::any& getContext() const { return context_; }
-
-    boost::any* getMutableContext() { return &context_; }
-
     static EventLoop* GetEventLoopOfCurrentThread();
 
 private:
@@ -89,9 +80,8 @@ private:
     uint64_t pollReturnTime_;
     std::unique_ptr<Poller> poller_;
     std::unique_ptr<TimerQueue> timerQueue_;
-    int wakeupFds_[2];
+    int wakefd_;
     std::unique_ptr<Channel> wakeupChannel_;
-    boost::any context_;
 
     // scratch variables
     ChannelList activeChannels_;

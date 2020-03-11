@@ -5,6 +5,7 @@
 #include "log.h"
 #include "macro.h"
 #include <fcntl.h>
+#include <sys/eventfd.h>
 #include <sys/timerfd.h>
 
 namespace fylee {
@@ -17,6 +18,15 @@ EventLoop* EventLoop::GetEventLoopOfCurrentThread() {
   return t_loopInThisThread;
 }
 
+static int createEventfd() {
+    int evtfd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+    if (evtfd < 0) {
+        LOG_FATAL(g_logger) << "Failed in eventfd\n";
+        abort();
+    }
+    return evtfd;
+}
+
 EventLoop::EventLoop() 
     :looping_(false),
      quit_(false),
@@ -26,13 +36,10 @@ EventLoop::EventLoop()
      threadId_(fylee::GetThreadId()),
      poller_(new Poller(this)),
      timerQueue_(new TimerQueue(this)),
+     wakefd_(createEventfd()), 
      currentActiveChannel_(nullptr) {
    
-    int rt = pipe(wakeupFds_);
-    ASSERT(!rt);
-    rt = fcntl(wakeupFds_[0], F_SETFL, O_NONBLOCK);
-    ASSERT(!rt);
-    wakeupChannel_.reset(new Channel(this, wakeupFds_[0]));
+    wakeupChannel_.reset(new Channel(this, wakefd_));
 
     LOG_DEBUG(g_logger) << "EventLoop created " << this << " in thread " << threadId_;
     if (t_loopInThisThread) {
@@ -50,8 +57,7 @@ EventLoop::~EventLoop() {
             << " destructs in thread " << fylee::GetThreadId();
     wakeupChannel_->disableAll();
     wakeupChannel_->remove();
-    close(wakeupFds_[0]);
-    close(wakeupFds_[1]);
+    close(wakefd_);
     t_loopInThisThread = nullptr;
 }
 
@@ -168,7 +174,7 @@ void EventLoop::abortNotInLoopThread() {
 
 void EventLoop::wakeup() {
     uint64_t one = 1;
-    ssize_t n = write(wakeupFds_[1], &one, sizeof(one));
+    ssize_t n = write(wakefd_, &one, sizeof(one));
     if (n != sizeof(one)) {
         LOG_ERROR(g_logger) << "EventLoop::wakeup() writes " << n << " bytes instead of 8";
     }
@@ -177,7 +183,7 @@ void EventLoop::wakeup() {
 void EventLoop::handleRead() {
     LOG_DEBUG(g_logger) << "EventLoop::handleRead()";
     uint64_t one = 1;
-    ssize_t n = read(wakeupFds_[0], &one, sizeof(one));
+    ssize_t n = read(wakefd_, &one, sizeof(one));
     if (n != sizeof(one)) {
         LOG_ERROR(g_logger) << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
     }
