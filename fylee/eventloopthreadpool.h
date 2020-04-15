@@ -20,7 +20,7 @@ public:
     void start(const ThreadInitCallback& cb = ThreadInitCallback());
 
     // valid after calling start()
-    /// round-robin
+    // round-robin
     EventLoop* getNextLoop();
 
     /// with the same hash code, it will always return the same EventLoop

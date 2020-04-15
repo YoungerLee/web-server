@@ -21,7 +21,6 @@ class Buffer;
 typedef std::function<void (const std::shared_ptr<Connection>)> ConnectionCallback;
 typedef std::function<void (const std::shared_ptr<Connection>)> CloseCallback;
 typedef std::function<void (const std::shared_ptr<Connection>)> WriteCompleteCallback;
-typedef std::function<void (const std::shared_ptr<Connection>, size_t)> HighWaterMarkCallback;
 typedef std::function<void (const std::shared_ptr<Connection>, uint64_t)> MessageCallback;
 
 class Acceptor : public std::enable_shared_from_this<Acceptor>, Noncopyable {

@@ -77,15 +77,15 @@ void Channel::handleEventWithGuard(uint64_t receiveTime) {
             writeCallback_();
         }   
     }
-    if(!isNoneEvent()) {
-        if ((events_ & EPOLLIN) && (events_ & EPOLLOUT)) {
-            events_ = EPOLLOUT;
-        }
-        events_ |= EPOLLET;
-    } else {
-        events_ |= (EPOLLIN | EPOLLET);
-    }
-    update();
+    // if(!isNoneEvent()) {
+    //     if ((events_ & EPOLLIN) && (events_ & EPOLLOUT)) {
+    //         events_ = EPOLLOUT;
+    //     }
+    //     events_ |= EPOLLET;
+    // } else {
+    //     events_ |= (EPOLLIN | EPOLLET);
+    // }
+    // update();
     eventHandling_ = false;
 }
 

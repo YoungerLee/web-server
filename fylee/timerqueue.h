@@ -2,6 +2,8 @@
 #define __FYLEE_TIMERQUEUE_H__
 
 #include <functional>
+#include <atomic>
+#include <queue>
 #include "timer.h"
 #include "noncopyable.h"
 
@@ -24,11 +26,6 @@ public:
     
     void cancelTimer(Timer::ptr timer);
 
-
-    Timer::ptr addConditionTimer(uint64_t ms, Functor func,
-                                 std::weak_ptr<void> weak_cond, 
-                                 bool recurring = false);
-
     uint64_t getNextTimer();
 
     uint64_t getFrontTimer();
@@ -41,14 +38,16 @@ public:
 
 private:
     RWMutexType mutex_;
-    std::set<Timer::ptr, Timer::Comparator> timers_;
- 
+
+    std::priority_queue<Timer::ptr, std::deque<Timer::ptr>, 
+                        Timer::Comparator> timers_; // minheap
+  
     bool tickled_ = false;  // 是否触发onTimerInsertedAtFront
     // 上次执行时间
     uint64_t previouseTime_ = 0;
 
     /**
-     * @brief 检测服务器时间是否被调后了
+     * 检测服务器时间是否被调后了
      */
     bool detectClockRollover(uint64_t now_ms);
 
@@ -64,7 +63,7 @@ private:
     EventLoop* loop_;
     const int timerfd_;
     std::unique_ptr<Channel> timerfdChannel_;
-    bool callingExpiredTimers_; /* atomic */
+    std::atomic_bool callingExpiredTimers_;
 };
 }
 #endif

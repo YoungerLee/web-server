@@ -36,8 +36,8 @@ void TimerQueue::cancelTimer(Timer::ptr timer) {
 
 void TimerQueue::addTimerInLoop(Timer::ptr timer) {
     RWMutexType::WriteLock lock(mutex_);
-    auto it = timers_.insert(timer).first;
-    bool at_front = (it == timers_.begin()) && !tickled_;
+    timers_.push(timer);
+    bool at_front = (timer == timers_.top()) && !tickled_;
     if(at_front) {
         tickled_ = true;
     }
@@ -54,23 +54,10 @@ void TimerQueue::cancelInLoop(Timer::ptr timer) {
     bool rt = false;
     if(timer->func_) {
         timer->func_ = nullptr;
-        auto it = timers_.find(timer);
-        timers_.erase(it);
+        timer->deleted_ = true;
         rt = true;
     }
     ASSERT(rt);
-}
-
-static void OnTimer(std::weak_ptr<void> weak_cond, std::function<void ()> func) {
-    if(weak_cond.lock()) {
-        func();
-    }
-}
-
-Timer::ptr TimerQueue::addConditionTimer(uint64_t ms, Functor func
-                                    ,std::weak_ptr<void> weak_cond
-                                    ,bool recurring) {
-    return addTimer(ms, std::bind(&OnTimer, weak_cond, func), recurring);
 }
 
 uint64_t TimerQueue::getNextTimer() {
@@ -80,7 +67,7 @@ uint64_t TimerQueue::getNextTimer() {
         return ~0ull;
     }
 
-    const Timer::ptr& next = *timers_.begin();
+    auto next = timers_.top();
     uint64_t now_ms = fylee::GetCurrentMS();
     if(now_ms >= next->next_) {
         return 0;
@@ -96,7 +83,7 @@ uint64_t TimerQueue::getFrontTimer() {
         return ~0ull;
     }
 
-    const Timer::ptr& next = *timers_.begin();
+    auto next = timers_.top();
     return next->next_;
 }
 
@@ -114,24 +101,26 @@ void TimerQueue::listExpiredFunc(std::vector<Functor>& funcs) {
         return;
     }
     bool rollover = detectClockRollover(now_ms); // 检测是否超时仍未执行
-    if(!rollover && ((*timers_.begin())->next_ > now_ms)) {
+    if(!rollover && (timers_.top()->next_ > now_ms)) {
         return;
     }
-
-    Timer::ptr now_timer(new Timer(now_ms));
-    auto it = rollover ? timers_.end() : timers_.lower_bound(now_timer);// 找出第一个大于等于now_ms的定时器
-    while(it != timers_.end() && (*it)->next_ == now_ms) {
-        ++it;
+    std::vector<Timer::ptr> expires;
+    while (!timers_.empty()) {
+        auto cur = timers_.top();
+        if (cur->next_ > now_ms) 
+            break;
+        else {
+            expires.push_back(cur);
+            timers_.pop();
+        }
     }
-    expired.insert(expired.begin(), timers_.begin(), it); // 将所有超时仍未执行的回调加入expired
-    timers_.erase(timers_.begin(), it);
-    funcs.reserve(expired.size());
-
-    for(auto& timer : expired) {
+    funcs.reserve(expires.size());
+    for (auto& timer : expires) {
+        if (timer->deleted_) continue;
         funcs.push_back(timer->func_);
-        if(timer->recurring_) {
+        if (timer->recurring_) {
             timer->next_ = now_ms + timer->ms_;
-            timers_.insert(timer);
+            timers_.push(timer);
         } else {
             timer->func_ = nullptr;
         }

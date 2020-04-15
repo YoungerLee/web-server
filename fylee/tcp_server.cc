@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include "tcp_server.h"
 #include "log.h"
-#include "weakcb.h"
 #include "macro.h"
 #include "eventloop.h"
 #include "eventloopthreadpool.h"
